@@ -17,3 +17,7 @@ SpotDown is a Spotify music downloading program, it's as simple as that!
 
 **How To Compile**
 * To compile this yourself you will need a YouTube API key, you can get that from here https://developers.google.com/youtube/v3/getting-started
+
+**A little bit of info**
+* This works the same way SpotyDL worked, in very basic terms it gets song names and then finds the highest quality song and downloads it from external search engine websites. This does NOT get the song from spotify itself as this is impossable.
+* The two surces are MP3Clan and YouTube, with MP3Clan being the main source
