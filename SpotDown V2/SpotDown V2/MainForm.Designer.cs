@@ -1,6 +1,6 @@
 ﻿namespace SpotDown_V2
 {
-    partial class Form1
+    partial class MainForm
     {
         /// <summary>
         /// Required designer variable.
@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
@@ -43,7 +43,7 @@
             this.label4 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.label6 = new System.Windows.Forms.Label();
-            this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.SongListUpdateTimer = new System.Windows.Forms.Timer(this.components);
             this.label9 = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
@@ -60,9 +60,9 @@
             this.label17 = new System.Windows.Forms.Label();
             this.checkBox1 = new System.Windows.Forms.CheckBox();
             this.label14 = new System.Windows.Forms.Label();
-            this.timer2 = new System.Windows.Forms.Timer(this.components);
+            this.LabelUpdateTimer = new System.Windows.Forms.Timer(this.components);
             this.newProgressBar1 = new NewProgressBar();
-            this.listView1 = new ListViewNF();
+            this.SongListView = new ListViewNF();
             this.Status = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.Song = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.groupBox1.SuspendLayout();
@@ -106,8 +106,8 @@
             this.label3.TabIndex = 15;
             this.label3.Text = "Drag and drop Spotify songs here to download.";
             this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-            this.label3.DragDrop += new System.Windows.Forms.DragEventHandler(this.listView1_DragDrop);
-            this.label3.DragEnter += new System.Windows.Forms.DragEventHandler(this.listView1_DragEnter);
+            this.label3.DragDrop += new System.Windows.Forms.DragEventHandler(this.SongListView_DragDrop);
+            this.label3.DragEnter += new System.Windows.Forms.DragEventHandler(this.SongListView_DragEnter);
             // 
             // groupBox1
             // 
@@ -131,7 +131,7 @@
             this.downloadDirOpenButton.Size = new System.Drawing.Size(28, 23);
             this.downloadDirOpenButton.TabIndex = 4;
             this.downloadDirOpenButton.UseVisualStyleBackColor = true;
-            this.downloadDirOpenButton.Click += new System.EventHandler(this.downloadDirOpenButton_Click);
+            this.downloadDirOpenButton.Click += new System.EventHandler(this.DownloadDirOpenButton_Click);
             // 
             // downloadDirBrowseButton
             // 
@@ -142,7 +142,7 @@
             this.downloadDirBrowseButton.Size = new System.Drawing.Size(28, 23);
             this.downloadDirBrowseButton.TabIndex = 3;
             this.downloadDirBrowseButton.UseVisualStyleBackColor = true;
-            this.downloadDirBrowseButton.Click += new System.EventHandler(this.downloadDirBrowseButton_Click);
+            this.downloadDirBrowseButton.Click += new System.EventHandler(this.DownloadDirBrowseButton_Click);
             // 
             // downloadDirTextBox
             // 
@@ -151,7 +151,7 @@
             this.downloadDirTextBox.ReadOnly = true;
             this.downloadDirTextBox.Size = new System.Drawing.Size(475, 20);
             this.downloadDirTextBox.TabIndex = 2;
-            this.downloadDirTextBox.TextChanged += new System.EventHandler(this.downloadDirTextBox_TextChanged);
+            this.downloadDirTextBox.TextChanged += new System.EventHandler(this.DownloadDirTextBox_TextChanged);
             // 
             // labelVersion
             // 
@@ -218,11 +218,11 @@
             this.label6.TabIndex = 22;
             this.label6.Text = "Found:";
             // 
-            // timer1
+            // SongListUpdateTimer
             // 
-            this.timer1.Enabled = true;
-            this.timer1.Interval = 1000;
-            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            this.SongListUpdateTimer.Enabled = true;
+            this.SongListUpdateTimer.Interval = 1000;
+            this.SongListUpdateTimer.Tick += new System.EventHandler(this.SongListUpdateTimer_Tick);
             // 
             // label9
             // 
@@ -255,7 +255,7 @@
             this.button1.TabIndex = 29;
             this.button1.Text = "Log >";
             this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.button1.Click += new System.EventHandler(this.Button1_Click);
             // 
             // groupBox2
             // 
@@ -391,7 +391,7 @@
             this.checkBox1.TabIndex = 33;
             this.checkBox1.Text = "Debug Mode";
             this.checkBox1.UseVisualStyleBackColor = true;
-            this.checkBox1.CheckedChanged += new System.EventHandler(this.checkBox1_CheckedChanged);
+            this.checkBox1.CheckedChanged += new System.EventHandler(this.CheckBox1_CheckedChanged);
             // 
             // label14
             // 
@@ -403,11 +403,11 @@
             this.label14.TabIndex = 22;
             this.label14.Text = "Downloading:";
             // 
-            // timer2
+            // LabelUpdateTimer
             // 
-            this.timer2.Enabled = true;
-            this.timer2.Interval = 1000;
-            this.timer2.Tick += new System.EventHandler(this.timer2_Tick);
+            this.LabelUpdateTimer.Enabled = true;
+            this.LabelUpdateTimer.Interval = 1000;
+            this.LabelUpdateTimer.Tick += new System.EventHandler(this.LabelUpdateTimer_Tick);
             // 
             // newProgressBar1
             // 
@@ -418,26 +418,26 @@
             this.newProgressBar1.Size = new System.Drawing.Size(558, 10);
             this.newProgressBar1.TabIndex = 28;
             // 
-            // listView1
+            // SongListView
             // 
-            this.listView1.AllowDrop = true;
-            this.listView1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(18)))), ((int)(((byte)(19)))), ((int)(((byte)(20)))));
-            this.listView1.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.listView1.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.SongListView.AllowDrop = true;
+            this.SongListView.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(18)))), ((int)(((byte)(19)))), ((int)(((byte)(20)))));
+            this.SongListView.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.SongListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.Status,
             this.Song});
-            this.listView1.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(132)))), ((int)(((byte)(189)))), ((int)(((byte)(0)))));
-            this.listView1.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
-            this.listView1.Location = new System.Drawing.Point(12, 34);
-            this.listView1.MultiSelect = false;
-            this.listView1.Name = "listView1";
-            this.listView1.Size = new System.Drawing.Size(558, 293);
-            this.listView1.TabIndex = 12;
-            this.listView1.UseCompatibleStateImageBehavior = false;
-            this.listView1.View = System.Windows.Forms.View.Details;
-            this.listView1.ItemSelectionChanged += new System.Windows.Forms.ListViewItemSelectionChangedEventHandler(this.listView1_ItemSelectionChanged);
-            this.listView1.DragDrop += new System.Windows.Forms.DragEventHandler(this.listView1_DragDrop);
-            this.listView1.DragEnter += new System.Windows.Forms.DragEventHandler(this.listView1_DragEnter);
+            this.SongListView.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(132)))), ((int)(((byte)(189)))), ((int)(((byte)(0)))));
+            this.SongListView.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
+            this.SongListView.Location = new System.Drawing.Point(12, 34);
+            this.SongListView.MultiSelect = false;
+            this.SongListView.Name = "SongListView";
+            this.SongListView.Size = new System.Drawing.Size(558, 293);
+            this.SongListView.TabIndex = 12;
+            this.SongListView.UseCompatibleStateImageBehavior = false;
+            this.SongListView.View = System.Windows.Forms.View.Details;
+            this.SongListView.ItemSelectionChanged += new System.Windows.Forms.ListViewItemSelectionChangedEventHandler(this.SongListView_ItemSelectionChanged);
+            this.SongListView.DragDrop += new System.Windows.Forms.DragEventHandler(this.SongListView_DragDrop);
+            this.SongListView.DragEnter += new System.Windows.Forms.DragEventHandler(this.SongListView_DragEnter);
             // 
             // Status
             // 
@@ -449,7 +449,7 @@
             this.Song.Text = "Song";
             this.Song.Width = 399;
             // 
-            // Form1
+            // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -466,14 +466,14 @@
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.listView1);
+            this.Controls.Add(this.SongListView);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
-            this.Name = "Form1";
+            this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "SpotDown";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Form1_FormClosing);
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.MainForm_FormClosing);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.groupBox2.ResumeLayout(false);
@@ -499,14 +499,14 @@
         private System.Windows.Forms.Button downloadDirBrowseButton;
         public System.Windows.Forms.TextBox downloadDirTextBox;
         private System.Windows.Forms.Label labelVersion;
-        private ListViewNF listView1;
+        private ListViewNF SongListView;
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.ImageList imageList1;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label6;
         private System.Windows.Forms.Label label9;
-        private System.Windows.Forms.Timer timer1;
+        private System.Windows.Forms.Timer SongListUpdateTimer;
         private System.Windows.Forms.Label label10;
         private NewProgressBar newProgressBar1;
         private System.Windows.Forms.Button button1;
@@ -523,7 +523,7 @@
         private System.Windows.Forms.Label label17;
         private System.Windows.Forms.Label label18;
         private System.Windows.Forms.Label label19;
-        private System.Windows.Forms.Timer timer2;
+        private System.Windows.Forms.Timer LabelUpdateTimer;
     }
 }
 

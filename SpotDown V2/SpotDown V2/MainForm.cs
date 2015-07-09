@@ -35,7 +35,7 @@ namespace SpotDown_V2
     //-Does not always start downloading first time. Restart program and try again.
     //-Progress bar can be glitchy.
 
-    public partial class Form1 : Form
+    public partial class MainForm : Form
     {
         private const string ApiKey = "{Enter Your YouTube Key Here}";
         string _dir = "songs/";
@@ -60,19 +60,25 @@ namespace SpotDown_V2
         private const string Website = @"http://jlynx.net/download/spotdown/SpotDown.exe";
         private readonly string _spotDownUa = "SpotDown " + Assembly.GetExecutingAssembly().GetName().Version + " " + Environment.OSVersion;
 
-        public Form1()
+        YouTubeDownloader youTubeDownloader = new YouTubeDownloader();
+
+        public MainForm()
         {
             CheckForIllegalCrossThreadCalls = false;
             InitializeComponent();
 
-            _ffmpegPath = Path.Combine(Path.GetTempPath(), "ffmpeg.exe");
-            File.WriteAllBytes(_ffmpegPath, Resources.ffmpeg);
-
             CheckUpdate();
-            listView1.SmallImageList = imageList1;
-
             Size = new Size(597, 448);
+            SongListView.SmallImageList = imageList1;
 
+            SetupFfmpeg();
+            SetupDir();
+            
+            Log("Started");
+        }
+
+        void SetupDir()
+        {
             if (Settings.Default.SaveDir.Length < 1)
             {
                 downloadDirTextBox.Text = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
@@ -88,7 +94,19 @@ namespace SpotDown_V2
                 DirectoryInfo di = Directory.CreateDirectory(_tempDir);
                 di.Attributes = FileAttributes.Directory | FileAttributes.Hidden;
             }
-            Log("Started");
+        }
+
+        void SetupFfmpeg()
+        {
+            try
+            {
+                _ffmpegPath = Path.Combine(Path.GetTempPath(), "ffmpeg.exe");
+                File.WriteAllBytes(_ffmpegPath, Resources.ffmpeg);
+            }
+            catch (Exception)
+            {
+
+            }
         }
 
         public void Log(string text, bool debugLog = false)
@@ -107,32 +125,6 @@ namespace SpotDown_V2
             {
                 textBox1.AppendText(string.Format(logFormat, DateTime.Now.ToLongTimeString(), logText));
             }
-        }
-
-        public class PassArguments
-        {
-            public string PassedURL { get; set; }
-            public string PassedSong { get; set; }
-            public string PassedArtist { get; set; }
-            public string PassedAlbum { get; set; }
-            public string PassedAlbumId { get; set; }
-            public int PassedNum { get; set; }
-            public string PassedFileName { get; set; }
-            public Mp3ClanTrack PassedTrack { get; set; }
-            public List<YouTubeVideoQuality> YouTubeVideoQuality { get; set; }
-            public string PassedSpotCode { get; set; }
-            public double PassedLength { get; set; }
-            public double PassedLengthMs { get; set; }
-            public string PassedimageURL { get; set; }
-            public int PassedSession { get; set; }
-        } 
-        
-        public class ListViewData
-        {
-            public string Message { get; set; }
-            public string FileName { get; set; }
-            public int Number { get; set; }
-            public int Image { get; set; }
         }
 
         private void CheckUpdate()
@@ -157,7 +149,7 @@ namespace SpotDown_V2
             return s;
         }
 
-        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (_running != 0)
             {
@@ -187,7 +179,7 @@ namespace SpotDown_V2
             }
         }
 
-        private void downloadDirTextBox_TextChanged(object sender, EventArgs e)
+        private void DownloadDirTextBox_TextChanged(object sender, EventArgs e)
         {
             _dir = downloadDirTextBox.Text + "/";
             _tempDir = _dir + "temp/";
@@ -198,13 +190,13 @@ namespace SpotDown_V2
             }
         }
 
-        private void listView1_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
+        private void SongListView_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
         {
             if (e.IsSelected)
                 e.Item.Selected = false;
         }
 
-        private void listView1_DragEnter(object sender, DragEventArgs e)
+        private void SongListView_DragEnter(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.StringFormat))
             {
@@ -212,7 +204,7 @@ namespace SpotDown_V2
             }
         }
 
-        private void listView1_DragDrop(object sender, DragEventArgs e)
+        private void SongListView_DragDrop(object sender, DragEventArgs e)
         {
             try
             {
@@ -231,7 +223,7 @@ namespace SpotDown_V2
                         if (str.Length > 1)
                         {
                             BackgroundWorker backgroundWorkerStart = new BackgroundWorker();
-                            backgroundWorkerStart.DoWork += backgroundWorkerStart_DoWork;
+                            backgroundWorkerStart.DoWork += BackgroundWorkerStart_DoWork;
                             backgroundWorkerStart.RunWorkerAsync(new PassArguments
                             {
                                 PassedSpotCode = str,
@@ -244,12 +236,12 @@ namespace SpotDown_V2
             catch (Exception ex) { MessageBox.Show(this, ex.Message, ex.Source, MessageBoxButtons.OK, MessageBoxIcon.Error); }
         }
 
-        private void downloadDirOpenButton_Click(object sender, EventArgs e)
+        private void DownloadDirOpenButton_Click(object sender, EventArgs e)
         {
             Process.Start(downloadDirTextBox.Text);
         }
 
-        private void downloadDirBrowseButton_Click(object sender, EventArgs e)
+        private void DownloadDirBrowseButton_Click(object sender, EventArgs e)
         {
             using (var fbd = new FolderBrowserDialog())
             {
@@ -264,7 +256,7 @@ namespace SpotDown_V2
             }
         }
 
-        private void backgroundWorkerStart_DoWork(object sender, DoWorkEventArgs e)
+        private void BackgroundWorkerStart_DoWork(object sender, DoWorkEventArgs e)
         {
             PassArguments result = (PassArguments)e.Argument;
             e.Result = result;
@@ -286,8 +278,7 @@ namespace SpotDown_V2
                     {
                         if (songThing != null)
                         {
-                            if (
-                                songThing.PassedFileName.Equals(spotifyName.PassedSong + " - " + spotifyName.PassedArtist))
+                            if (songThing.PassedFileName.Equals(spotifyName.PassedSong + " - " + spotifyName.PassedArtist))
                             {
                                 //File already in list
                                 _songs--;
@@ -300,7 +291,7 @@ namespace SpotDown_V2
                     }
                 }
             }
-            if (File.Exists(_dir + escapeFilename(spotifyName.PassedFileName) + ".mp3"))
+            if (File.Exists(_dir + EscapeFilename(spotifyName.PassedFileName) + ".mp3"))
             {
                 //File already exsists/Downloaded
                 _songs--;
@@ -313,14 +304,14 @@ namespace SpotDown_V2
                 if (add)
                 {
                     {
-                        listView1.BeginUpdate();
+                        SongListView.BeginUpdate();
                         string[] row = { "Waiting", spotifyName.PassedSong + " - " + spotifyName.PassedArtist };
                         var listViewItem = new ListViewItem(row);
                         listViewItem.ImageIndex = 1;
-                        listView1.Items.Add(listViewItem);
+                        SongListView.Items.Add(listViewItem);
                         SetLabelVisible(false);
                         num = listViewItem.Index;
-                        listView1.EndUpdate();
+                        SongListView.EndUpdate();
 
                         songArray[session][num] = (new PassArguments
                         {
@@ -337,7 +328,7 @@ namespace SpotDown_V2
                     }
                 }
 
-//                if (listView1.Items.Count == songs)
+//                if (SongListView.Items.Count == songs)
                 int result = songArray[session].Count(s => s != null);
 //                Log(result + " | " + songsArray[current]);
                 if (result == songsArray[_current])
@@ -408,10 +399,10 @@ namespace SpotDown_V2
             }
             
 
-            IEnumerable<Mp3ClanTrack> trackResualt;
-            if (Mp3ClanTrack.TryParseFromSource(pageSource, out trackResualt))
+            IEnumerable<Mp3ClanTrack> trackResult;
+            if (Mp3ClanTrack.TryParseFromSource(pageSource, out trackResult))
             {
-                tracks = trackResualt.ToList();
+                tracks = trackResult.ToList();
                 foreach (var track in tracks)
                 {
                     if (track.Artist.ToLower().Trim().Contains(result.PassedArtist.ToLower()) &&
@@ -719,7 +710,7 @@ namespace SpotDown_V2
                 return;
             }
 
-            songArray[session][num].YouTubeVideoQuality = YouTubeDownloader.GetYouTubeVideoUrls(result.PassedURL);
+            songArray[session][num].YouTubeVideoQuality = youTubeDownloader.GetYouTubeVideoUrls(result.PassedURL);
             if (songArray[session][num].YouTubeVideoQuality == null)
             {
 //                Log("Cant download " + result.passedFileName + " because of age restriction on video");
@@ -759,7 +750,7 @@ namespace SpotDown_V2
                     {
                         YouTubeVideoQuality tempItem = highestQual;
                         Url = tempItem.DownloadUrl;
-                        saveTo = escapeFilename(result.PassedFileName) + ".mp4";
+                        saveTo = EscapeFilename(result.PassedFileName) + ".mp4";
                     }
                     catch (Exception ex)
                     {
@@ -809,14 +800,14 @@ namespace SpotDown_V2
 //            _process.StartInfo.FileName = "ffmpeg";
             _process.StartInfo.FileName = _ffmpegPath;
             //            _process.StartInfo.Arguments = " -i \"" + SongName + ".mp4\" -vn -f mp3 -ab 192k \"" + SongName + ".mp3\"";
-            _process.StartInfo.Arguments = " -i \"" + _tempDir + escapeFilename(songName) + ".mp4\" -vn -f mp3 -ab 320k \"" + _dir + escapeFilename(songName) + ".mp3\"";
+            _process.StartInfo.Arguments = " -i \"" + _tempDir + EscapeFilename(songName) + ".mp4\" -vn -f mp3 -ab 320k \"" + _dir + EscapeFilename(songName) + ".mp3\"";
             _process.Start();
 //            _process.StandardOutput.ReadToEnd();
 //            output = _process.StandardError.ReadToEnd();
             _process.WaitForExit();
-            if (File.Exists(_tempDir + escapeFilename(songName) + ".mp4"))
+            if (File.Exists(_tempDir + EscapeFilename(songName) + ".mp4"))
             {
-                File.Delete(_tempDir + escapeFilename(songName) + ".mp4");
+                File.Delete(_tempDir + EscapeFilename(songName) + ".mp4");
             }
         }
 
@@ -841,7 +832,7 @@ namespace SpotDown_V2
                 try
                 {
                     downloadUrl = new Uri(result.PassedTrack.Mp3ClanUrl);
-                    var fileName = _dir + "\\" + escapeFilename(result.PassedFileName) + ".mp3";
+                    var fileName = _dir + "\\" + EscapeFilename(result.PassedFileName) + ".mp3";
 
                     int errorTimes = 0;
                     while (true)
@@ -894,7 +885,7 @@ namespace SpotDown_V2
             try
             {
                 //===edit tags====
-                TagLib.File f = TagLib.File.Create(_dir + escapeFilename(result.PassedFileName) + ".mp3");
+                TagLib.File f = TagLib.File.Create(_dir + EscapeFilename(result.PassedFileName) + ".mp3");
                 f.Tag.Clear();
                 f.Tag.AlbumArtists = new string[1] { result.PassedArtist };
                 f.Tag.Performers = new string[1] { result.PassedArtist };
@@ -1041,7 +1032,7 @@ namespace SpotDown_V2
             return pass;
         }
 
-        string escapeFilename(string name)
+        string EscapeFilename(string name)
         {
             name = name.Replace("/", "_");
             name = name.Replace("\\", "_");
@@ -1060,10 +1051,10 @@ namespace SpotDown_V2
             var data = new ListViewData {Message = message, FileName = fileName, Number = number, Image = image};
             downloadData[number] = (data);
         }
-       
-        private void timer1_Tick(object sender, EventArgs e)
+
+        private void SongListUpdateTimer_Tick(object sender, EventArgs e)
         {
-            listView1.BeginUpdate();
+            SongListView.BeginUpdate();
             foreach (var downloadInfo in downloadData)
             {
                 if (downloadInfo != null)
@@ -1071,22 +1062,22 @@ namespace SpotDown_V2
                     string[] row = { downloadInfo.Message, downloadInfo.FileName };
                     var listViewItem = new ListViewItem(row);
                     listViewItem.ImageIndex = downloadInfo.Image;
-                    if (listView1.Items[downloadInfo.Number] == null)
+                    if (SongListView.Items[downloadInfo.Number] == null)
                     {
-                        listView1.Items.Add(listViewItem);
+                        SongListView.Items.Add(listViewItem);
                     }
                     else
                     {
-                        listView1.Items[downloadInfo.Number] = (listViewItem);
+                        SongListView.Items[downloadInfo.Number] = (listViewItem);
                     }
                 }
                
             }
-            listView1.EndUpdate();
+            SongListView.EndUpdate();
         }
 
         private bool logStyle = false;
-        private void button1_Click(object sender, EventArgs e)
+        private void Button1_Click(object sender, EventArgs e)
         {
             if (logStyle)
             {
@@ -1102,12 +1093,12 @@ namespace SpotDown_V2
             }
         }
 
-        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        private void CheckBox1_CheckedChanged(object sender, EventArgs e)
         {
             _debug = checkBox1.Checked;
         }
 
-        private void timer2_Tick(object sender, EventArgs e)
+        private void LabelUpdateTimer_Tick(object sender, EventArgs e)
         {
             label9.Text = _running.ToString();
             label5.Text = _youtubeNum.ToString();

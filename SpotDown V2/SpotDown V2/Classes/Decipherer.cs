@@ -13,14 +13,15 @@ namespace SpotDown_V2
     /// Website: http://jlynx.net/
     /// Twitter: https://twitter.com/jLynx_DarkN3ss
     /// </summary>
-    internal static class Decipherer
+    internal class Decipherer
     {
-        public static string DecipherWithVersion(string cipher, string cipherVersion)
+        Helper helper = new Helper();
+        public string DecipherWithVersion(string cipher, string cipherVersion)
         {
             string jsUrl = string.Format("http://s.ytimg.com/yts/jsbin/html5player-{0}.js", cipherVersion);
 
             // Original: string js = HttpHelper.DownloadString(jsUrl);
-            string js = Helper.DownloadWebPage(jsUrl);
+            string js = helper.DownloadWebPage(jsUrl);
 
             //Find "C" in this: var A = B.sig||C (B.s)
             string functNamePattern = @"\.sig\s*\|\|([a-zA-Z0-9\$]+)\("; //Regex Formed To Find Word or DollarSign
@@ -96,7 +97,7 @@ namespace SpotDown_V2
             return DecipherWithOperations(cipher, operations);
         }
 
-        private static string ApplyOperation(string cipher, string op)
+        private string ApplyOperation(string cipher, string op)
         {
             switch (op[0])
             {
@@ -120,13 +121,13 @@ namespace SpotDown_V2
             }
         }
 
-        private static string DecipherWithOperations(string cipher, string operations)
+        private string DecipherWithOperations(string cipher, string operations)
         {
             return operations.Split(new[] { " " }, StringSplitOptions.RemoveEmptyEntries)
                 .Aggregate(cipher, ApplyOperation);
         }
 
-        private static string GetFunctionFromLine(string currentLine)
+        private string GetFunctionFromLine(string currentLine)
         {
             Regex matchFunctionReg = new Regex(@"\w+\.(?<functionID>\w+)\("); //lc.ac(b,c) want the ac part.
             Match rgMatch = matchFunctionReg.Match(currentLine);
@@ -134,7 +135,7 @@ namespace SpotDown_V2
             return matchedFunction; //return 'ac'
         }
 
-        private static int GetOpIndex(string op)
+        private int GetOpIndex(string op)
         {
             string parsed = new Regex(@".(\d+)").Match(op).Result("$1");
             int index = Int32.Parse(parsed);
@@ -142,7 +143,7 @@ namespace SpotDown_V2
             return index;
         }
 
-        private static string SwapFirstChar(string cipher, int index)
+        private string SwapFirstChar(string cipher, int index)
         {
             var builder = new StringBuilder(cipher);
             builder[0] = cipher[index];

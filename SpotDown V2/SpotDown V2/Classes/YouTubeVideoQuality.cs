@@ -67,10 +67,11 @@ namespace SpotDown_V2.Classes
     /// <summary>
     /// Use this class to get youtube video urls
     /// </summary>
-    public static class YouTubeDownloader
+    public class YouTubeDownloader
     {
+        private Helper helper = new Helper();
 
-        public static List<YouTubeVideoQuality> GetYouTubeVideoUrls(string VideoUrl)
+        public List<YouTubeVideoQuality> GetYouTubeVideoUrls(string VideoUrl)
         {
             var list = new List<YouTubeVideoQuality>();
 
@@ -103,7 +104,7 @@ namespace SpotDown_V2.Classes
                     // If the download-URL contains encrypted signature
                     if (data["s"] != null)
                     {
-                        string html = Helper.DownloadWebPage(VideoUrl);
+                        string html = helper.DownloadWebPage(VideoUrl);
                         string Player_Version = Regex.Match(html, @"""\\/\\/s.ytimg.com\\/yts\\/jsbin\\/html5player-(.+?)\.js""").Groups[1].ToString();
 
                         // Decrypt the signature
@@ -130,10 +131,10 @@ namespace SpotDown_V2.Classes
             return list;
         }
 
-        private static long getSize(string videoUrl)
+        private long getSize(string videoUrl)
         {
             HttpWebRequest fileInfoRequest = (HttpWebRequest)HttpWebRequest.Create(videoUrl);
-            fileInfoRequest.Proxy = Helper.InitialProxy();
+            fileInfoRequest.Proxy = helper.InitialProxy();
             HttpWebResponse fileInfoResponse = (HttpWebResponse)fileInfoRequest.GetResponse();
             long bytesLength = fileInfoResponse.ContentLength;
             fileInfoRequest.Abort();
@@ -145,7 +146,7 @@ namespace SpotDown_V2.Classes
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
-        public static string GetVideoIDFromUrl(string url)
+        public string GetVideoIDFromUrl(string url)
         {
             url = url.Substring(url.IndexOf("?") + 1);
             char[] delimiters = { '&', '#' };
@@ -166,14 +167,15 @@ namespace SpotDown_V2.Classes
         /// <summary>
         /// Decrypt the signature (uses code from project "YoutubeExtractor")
         /// </summary>
-        private static string GetDecipheredSignature(string htmlPlayerVersion, string signature)
+        private string GetDecipheredSignature(string htmlPlayerVersion, string signature)
         {
+            Decipherer decipherer = new Decipherer();
             int CorrectSignatureLength = 81;
             if (signature.Length == CorrectSignatureLength)
             {
                 return signature;
             }
-            return Decipherer.DecipherWithVersion(signature, htmlPlayerVersion);
+            return decipherer.DecipherWithVersion(signature, htmlPlayerVersion);
         }
 
     }
