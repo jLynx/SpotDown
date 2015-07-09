@@ -104,7 +104,7 @@
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(507, 13);
             this.label3.TabIndex = 15;
-            this.label3.Text = "Drag and drop Spotidy songs here to download.";
+            this.label3.Text = "Drag and drop Spotify songs here to download.";
             this.label3.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             this.label3.DragDrop += new System.Windows.Forms.DragEventHandler(this.listView1_DragDrop);
             this.label3.DragEnter += new System.Windows.Forms.DragEventHandler(this.listView1_DragEnter);
