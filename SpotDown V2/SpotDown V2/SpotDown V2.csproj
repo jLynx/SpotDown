@@ -193,6 +193,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="bin\ffmpeg.exe" />
+    <None Include="ffmpeg.exe" />
     <Content Include="FodyWeavers.xml" />
     <Content Include="Xenatt-The-Circle-App-Spotify.ico" />
   </ItemGroup>
