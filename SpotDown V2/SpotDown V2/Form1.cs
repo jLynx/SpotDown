@@ -37,7 +37,7 @@ namespace SpotDown_V2
 
     public partial class Form1 : Form
     {
-        private const string ApiKey = "AIzaSyDGiPclA6K7Kr7MoiHd7iIplSB5mfNrudg";
+        private const string ApiKey = "{Enter Your YouTube Key Here}";
         string _dir = "songs/";
         string _tempDir = "songs/temp/";
         int maxRunning = 10;
