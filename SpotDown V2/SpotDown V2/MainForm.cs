@@ -129,24 +129,29 @@ namespace SpotDown_V2
 
         private void CheckUpdate()
         {
-            int latest = Convert.ToInt32(GetPage("http://jlynx.net/download/spotdown/version.txt", _spotDownUa));
-            int currentVersion = Convert.ToInt32(Assembly.GetExecutingAssembly().GetName().Version.ToString().Replace(".", ""));
-            labelVersion.Text = "Version: " + Assembly.GetExecutingAssembly().GetName().Version;
-            if (latest <= currentVersion)
-                return;
-            if (MessageBox.Show("There is a newer version of SpotDown available. Would you like to upgrade?", "SpotDown", MessageBoxButtons.YesNo) == DialogResult.Yes)
+            WebClient wc = new WebClient();
+            int latest = 0;
+            try
             {
-                Process.Start(Website);
-                Application.Exit();
+                latest = Convert.ToInt32(wc.DownloadString("http://jlynx.net/download/spotdown/version.txt"));
             }
-        }
-
-        private string GetPage(string url, string ua)
-        {
-            var w = new WebClient();
-            w.Headers.Add("user-agent", ua);
-            string s = w.DownloadString(url);
-            return s;
+            catch (WebException ex)
+            {
+                Log("Could not reach update server.");
+            }
+            
+            int currentVersion = Convert.ToInt32(Application.ProductVersion.Replace(".", ""));
+            labelVersion.Text = "Version: " + Assembly.GetExecutingAssembly().GetName().Version;
+            if (currentVersion < latest )
+            {
+                if (
+                    MessageBox.Show("There is a newer version of SpotDown available. Would you like to upgrade?",
+                        "SpotDown", MessageBoxButtons.YesNo) == DialogResult.Yes)
+                {
+                    Process.Start(Website);
+                    Application.Exit();
+                }
+            }
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
